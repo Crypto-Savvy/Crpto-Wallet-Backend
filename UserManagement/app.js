@@ -1,12 +1,12 @@
 require("dotenv").config();
-require("../DbConfiguration/dbConnection");
+require("../configs/dbConnection");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const app = express();
 app.use(express.json());
 // Logic goes here
-const User = require("../DbConfiguration/dbConnection");
+const User = require("../configs/dbConnection");
 //const Contact = require("./db/dbConnection");
 // our register logic goes here...
 app.post("/register", async (req, res) => {
@@ -44,7 +44,7 @@ app.post("/register", async (req, res) => {
 
     // Create token
     const token = jwt.sign(
-      { user_id: user._id, email },
+      { user_id: user._id, role: "basic" },
       process.env.TOKEN_KEY,
       {
         expiresIn: "2h",

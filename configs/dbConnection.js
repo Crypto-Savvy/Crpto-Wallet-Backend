@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 
 //Connect the using mongoose to the database
-mongoose.connect("mongodb://localhost:27017/CryptoWalletBackend", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-mongoose.set("strictQuery", false);
+mongoose.connect(
+  "mongodb+srv://etana:1234abcd@cluster0.mv9yu4y.mongodb.net/CryptoWalletBackend",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
+mongoose.set("strictQuery", true);
 //Now we have to create a schema
 const contactInfoSchema = new mongoose.Schema({
   first_name: { type: String, default: null },
