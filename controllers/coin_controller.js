@@ -1,6 +1,6 @@
-const express = require("express");
 const { adminAuth, userAuth } = require("../middleware/auth");
 const Coin = require("../models/coin_model");
+const path = require("path");
 
 //fetch all coins
 exports.getCoins = async (req, res) => {
@@ -94,17 +94,7 @@ exports.deleteCoin = async (req, res) => {
 //fetch coin icon
 exports.getCoinIcon = async (req, res) => {
   try {
-    console.log("test");
-    var filePath = path.join(__dirname).join("/upload/" + req.params.id);
-    console.log(filePath);
-    fetch(filePath)
-      //                         vvvv
-      .then((response) => response.blob())
-      .then((imageBlob) => {
-        // Then create a local URL for that image and print it
-        const imageObjectURL = URL.createObjectURL(imageBlob);
-        console.log(imageObjectURL);
-      });
+    res.sendFile(path.resolve(__dirname, "../public/" + req.params.id));
   } catch (error) {
     res.status(400).send(error);
   }
@@ -125,10 +115,14 @@ exports.uploadCoinIcon = async (req, res) => {
     if (/image^/.test(image.mimetype))
       return res.status(400).send({ error: "invalid mime type" });
 
-    // Move the uploaded image to our upload folder
-    image.mv(
-      __dirname + "/upload/" + req.params.id + "." + image.mimetype.substr(6)
-    );
+    // image.mv(
+    //   path.resolve(
+    //     __dirname,
+    //     "../public/" + req.params.id + "." + image.mimetype.substr(6)
+    //   )
+    // );
+
+    image.mv(path.resolve(__dirname, "../public/" + req.params.id));
 
     res.sendStatus(200);
   } catch (error) {

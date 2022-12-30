@@ -2,11 +2,16 @@ require("dotenv").config();
 const express = require("express");
 require("./configs/dbConnection");
 const fileUpload = require("express-fileupload");
+const path = require("path");
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+var dir = path.join(__dirname, "public");
+
+app.use(express.static(dir));
 app.use(
   fileUpload({
     limits: {
