@@ -3,16 +3,19 @@ const router = express.Router();
 
 const {
   getCoins,
+  getCoinsChange,
   getCoinById,
   createCoin,
   updateCoin,
   deleteCoin,
   getCoinIcon,
   uploadCoinIcon,
-} = require("../controllers/coin_controller");
+  findOne,
+} = require("../controller/coin.controller");
 const { adminAuth } = require("../middleware/auth");
 
 router.route("/coins").get(getCoins);
+router.route("/coins/change").get(getCoinsChange);
 router.route("/coins/:id").get(getCoinById);
 // router.route("/coins").post(adminAuth, createCoin);
 // router.route("/coins/:id").put(adminAuth, updateCoin);

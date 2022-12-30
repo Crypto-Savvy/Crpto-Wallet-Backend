@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const coinSchema = new mongoose.Schema({
+var Schema = mongoose.Schema;
+const coinSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -19,5 +20,13 @@ const coinSchema = new mongoose.Schema({
     unique: true,
   },
 });
-const Coin = mongoose.model("Coin", coinSchema);
-module.exports = Coin;
+
+coinSchema.method("transform", function () {
+  var obj = this.toObject();
+  obj.id = obj._id;
+  delete obj._id;
+  delete obj.__v;
+  return obj;
+});
+
+module.exports = mongoose.model("Coin", coinSchema);

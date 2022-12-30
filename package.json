@@ -1,14 +1,28 @@
 {
   "name": "crypto-wallet",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Crypto wallet backend for Crpto wallet mobile app and web",
+  "main": "server.js",
+  "readmeFilename": "README.md",
+  "private": false,
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon src/server.js",
+    "swagger-autogen": "node ./swagger.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "Crpto",
+    "Wallet",
+    "Exchange"
+  ],
+  "author": {
+    "name": "Motuma Gishu, Etana Alemu, Eskinder Abera, Tamiru Diriba",
+    "email": "gishumotuma@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Crypto-Savvy/Crpto-Wallet-Backend.git"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -16,7 +30,10 @@
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
     "jsonwebtoken": "^9.0.0",
+    "md5": "^2.3.0",
     "mongoose": "^6.8.1",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "swagger-autogen": "^2.22.0",
+    "swagger-ui-express": "^4.6.0"
   }
 }
