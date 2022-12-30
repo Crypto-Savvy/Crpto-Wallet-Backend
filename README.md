@@ -26,7 +26,7 @@ Run the project and access the documentation at:
 
 See the result after construction:
 
-![](https://raw.githubusercontent.comhttps://github.com/Crypto-Savvy/Crpto-Wallet-Backend/master/Screenshoots/Screenshot-2022-12-30-205456.png)
+![](https://github.com/Crypto-Savvy/Crpto-Wallet-Backend/blob/etana/Screenshots/Screenshot-2022-12-30-205456.png)
 
 ## License
 
