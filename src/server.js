@@ -21,10 +21,10 @@ app.use(
 );
 
 /* Routes */
-const router = require("./router/coin.router");
+const router = require("./router");
 
 /* Middlewares */
-app.use("/api/v1/", router);
+app.use(router);
 app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 const port = process.env.PORT || 10000;
