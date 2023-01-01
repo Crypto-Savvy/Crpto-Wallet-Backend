@@ -97,13 +97,16 @@ exports.createCoin = async (req, res) => {
     }] */
 
   try {
-    const coin = new Coin(req.body);
+    const coin = new Coin({
+      ...req.body,
+      _id: req.body.id,
+    });
     const duplicateCoinName = await Coin.findOne({ name: coin.name });
     if (duplicateCoinName)
       return res.status(400).send({ message: "Duplicate coin name" });
-    const duplicateCoinCode = await Coin.findOne({ code: coin.code });
-    if (duplicateCoinCode)
-      return res.status(400).send({ message: "Duplicate coin code" });
+    const duplicateCoinSymbol = await Coin.findOne({ symbol: coin.symbol });
+    if (duplicateCoinSymbol)
+      return res.status(400).send({ message: "Duplicate coin symbol" });
     const duplicateCoinIcon = await Coin.findOne({ icon: coin.icon });
     if (duplicateCoinIcon)
       return res.status(400).send({ message: "Duplicate coin icon" });
@@ -133,7 +136,7 @@ exports.updateCoin = async (req, res) => {
     }] */
 
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "code", "price", "icon"];
+  const allowedUpdates = ["name", "symbol", "price", "icon"];
 
   const isValidOperation = updates.every((update) =>
     allowedUpdates.includes(update)

@@ -24,10 +24,10 @@ app.use(
 const router = require("./router/coin.router");
 
 /* Middlewares */
-app.use(router);
+app.use("/api/v1/", router);
 app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000;
 
 app.listen(port, () => {
   console.log(
