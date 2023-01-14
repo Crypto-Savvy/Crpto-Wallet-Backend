@@ -1,6 +1,5 @@
 const dotenv = require("dotenv").config()
 const express = require("express")
-const dbConfig = require("./config/dbConnection")
 const fileUpload = require("express-fileupload")
 const path = require("path")
 const swaggerUi = require("swagger-ui-express")
@@ -9,21 +8,28 @@ const bodyParser = require("body-parser")
 const session = require("express-session")
 const cors = require("cors")
 const errorHandler = require("errorhandler")
-const passport = require("passport")
-
 var os = require("os")
+
+//Configure Mongoose
+require("./config/dbConnection")
+
+require("./config/passport")
 
 //Configure isProduction variable
 const isProduction = process.env.NODE_ENV === "production"
 
 const app = express()
 
+/* Routes */
+const router = require("./router")
+
+/* Middlewares */
+
 app.use(cors())
-app.use(express.json())
+app.use(require("morgan")("dev"))
 app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
 app.use(express.static(path.resolve(__dirname, "../public/")))
-app.use(passport.initialize())
-app.use(passport.session())
 app.use(
     fileUpload({
         limits: {
@@ -41,16 +47,6 @@ app.use(
     })
 )
 
-require("./config/passport")(passport)
-
-if (!isProduction) {
-    app.use(errorHandler())
-}
-
-/* Routes */
-const router = require("./router")
-
-/* Middlewares */
 app.use(router)
 app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
@@ -66,7 +62,10 @@ if (!isProduction) {
             },
         })
     })
+
+    app.use(errorHandler())
 }
+
 app.use((err, req, res) => {
     res.status(err.status || 500)
 

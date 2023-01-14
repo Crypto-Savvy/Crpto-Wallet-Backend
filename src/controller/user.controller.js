@@ -1,4 +1,5 @@
-const User = require("../model/user.model")
+const mongoose = require("mongoose")
+const User = mongoose.model("Users")
 const bcrypt = require("bcryptjs")
 
 exports.update = async (req, res, next) => {

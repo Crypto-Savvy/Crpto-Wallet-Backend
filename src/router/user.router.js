@@ -7,11 +7,11 @@ const {
     user,
     users,
 } = require("../controller/user.controller")
-const { adminAuth } = require("../middleware/auth")
+// const { adminAuth } = require("../middleware/auth")
 
-router.route("/user/:id").put(adminAuth, update)
-router.route("/user/:id").delete(adminAuth, deleteUser)
-router.route("/user").get(users)
-router.route("/user/:id").get(user)
+// router.route("/users/:id").put(adminAuth, update)
+// router.route("/users/:id").delete(adminAuth, deleteUser)
+router.route("/users").get(users)
+router.route("/users/:id").get(user)
 
 module.exports = router

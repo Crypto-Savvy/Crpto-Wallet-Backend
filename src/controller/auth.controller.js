@@ -1,4 +1,5 @@
 // const User = require("../model/user.model.js")
+const mongoose = require("mongoose")
 const Users = mongoose.model("Users")
 const passport = require("passport")
 
@@ -27,21 +28,30 @@ exports.register = async (req, res, next) => {
             .json({ message: "Password less than 6 characters" })
     }
 
-    const User = new Users({ ...req.body })
+    // return User.save().then((user) => {
+    //     res.status(201).json({
+    //         message: "User successfully created",
+    //         user: User.toAuthJSON(),
+    //     })
+    // })
 
-    return User.save().then((user) => {
-        res.status(201)
-            .json({
-                message: "User successfully created",
-                user: User.toAuthJSON(),
-            })
-            .catch((error) =>
-                res.status(400).json({
-                    message: "User not successful created",
-                    error: error.message,
+    await Users.findOne({ username: req.body.username })
+        .then((user) => {
+            if (user) return res.status(400).json({ message: "Username exist" })
+
+            const User = new Users({ ...req.body })
+            return User.save().then((user) => {
+                res.status(201).json({
+                    message: "User successfully created",
+                    user: User.toAuthJSON(),
                 })
-            )
-    })
+            })
+        })
+        .catch((err) =>
+            res
+                .status(400)
+                .json({ message: "Not successful", error: err.message })
+        )
 }
 
 exports.login = async (req, res, next) => {
