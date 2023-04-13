@@ -76,7 +76,7 @@ exports.getCoinById = async (req, res) => {
       schema: { "$ref": "#/definitions/coin" },
       description: "Coin listed successfully." } */
     try {
-        const coin = await Coin.findOne({ _id: req.params.id })
+        const coin = await Coin.findOne({ id: req.params.id })
         if (!coin) {
             res.status(404).send({ error: "Coin not found" })
         }
@@ -98,7 +98,7 @@ exports.createCoin = async (req, res) => {
     try {
         const coin = new Coin({
             ...req.body,
-            _id: req.body.id,
+            // _id: req.body.id,
         })
         const duplicateCoinName = await Coin.findOne({ name: coin.name })
         if (duplicateCoinName)
@@ -106,7 +106,9 @@ exports.createCoin = async (req, res) => {
         const duplicateCoinSymbol = await Coin.findOne({ symbol: coin.symbol })
         if (duplicateCoinSymbol)
             return res.status(400).send({ message: "Duplicate coin symbol" })
-        const duplicateCoinIcon = await Coin.findOne({ icon: coin.icon })
+        const duplicateCoinIcon = await Coin.findOne({
+            imageUrl: coin.imageUrl,
+        })
         if (duplicateCoinIcon)
             return res.status(400).send({ message: "Duplicate coin icon" })
 
@@ -135,7 +137,7 @@ exports.updateCoin = async (req, res) => {
     }] */
 
     const updates = Object.keys(req.body)
-    const allowedUpdates = ["name", "symbol", "price", "icon"]
+    const allowedUpdates = ["name", "symbol", "imageUrl"]
 
     const isValidOperation = updates.every((update) =>
         allowedUpdates.includes(update)
@@ -169,15 +171,40 @@ exports.deleteCoin = async (req, res) => {
     /* #swagger.security = [{
             "apiKeyAuth": []
     }] */
-    try {
-        const deletedCoin = await Coin.findOneAndDelete({ _id: req.params.id })
-        if (!deletedCoin) {
-            res.status(404).send({ error: "Coin not found" })
-        }
-        res.send(deletedCoin)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+    const id = req.params.id
+    await Coin.findOne({ id: id })
+        .then(async (coin) => {
+            if (coin) {
+                Coin.findByIdAndDelete(coin._id)
+                    .then((data) => {
+                        if (data) {
+                            res.status(200).json({
+                                message: "Coin delete successfull",
+                            })
+                        } else {
+                            res.status(400).json({
+                                message: "An error occurred",
+                            })
+                        }
+                    })
+                    .catch((err) =>
+                        res.status(400).json({
+                            message: "Delete not successful",
+                            error: err.message,
+                        })
+                    )
+            } else {
+                res.status(400).json({
+                    message: "Coin not exist",
+                })
+            }
+        })
+        .catch((err) =>
+            res.status(400).json({
+                message: "Find Coin not successful",
+                error: err.message,
+            })
+        )
 }
 
 //fetch coin icon
@@ -215,19 +242,30 @@ exports.uploadCoinIcon = async (req, res) => {
         // Get the file that was set to our field named "image"
         const { image } = req.files
 
-        console.log(req.files)
+        console.log(image)
 
         // If no image submitted, exit
         if (!image) return res.status(400).send({ error: "no image" })
 
         // If does not have image mime type prevent from uploading
-        if (/image^/.test(image.mimetype))
+        // if (/image^/.test(image.mimetype))
+        //     return res.status(400).send({ error: "invalid mime type" })
+        if (
+            !path.extname(image.name) ||
+            !path.extname(image.name).match(/\.(jpg|jpeg|png)$/i)
+        ) {
             return res.status(400).send({ error: "invalid mime type" })
+        }
 
-        image.mv(path.resolve(__dirname, "../../public/" + req.params.id))
+        image.mv(
+            path.resolve(
+                __dirname,
+                "../../public/" + req.body.name + path.extname(image.name)
+            )
+        )
 
         res.sendStatus(200)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).send({ error: error })
     }
 }

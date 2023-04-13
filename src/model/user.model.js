@@ -22,6 +22,16 @@ const UserSchema = new Schema(
         },
     },
     {
+        toJSON: {
+            transform: function (doc, ret) {
+                ret.id = ret._id
+                delete ret._id
+                delete ret.password
+                delete ret.__v
+            },
+        },
+    },
+    {
         timestamps: true,
     }
 )
@@ -58,20 +68,26 @@ UserSchema.methods.generateJWT = function () {
 
     return jwt.sign(
         {
-            email: this.email,
             id: this._id,
             exp: parseInt(expirationDate.getTime() / 1000, 10),
         },
-        "secret"
+        process.env.TOKEN_SECRET
     )
 }
 
 UserSchema.methods.toAuthJSON = function () {
     return {
-        _id: this._id,
-        email: this.email,
+        id: this._id,
         token: this.generateJWT(),
     }
 }
+
+UserSchema.method("transform", function () {
+    var obj = this.toObject()
+    // obj.id = obj._id;
+    delete obj._id
+    delete obj.__v
+    return obj
+})
 
 mongoose.model("Users", UserSchema)

@@ -1,4 +1,7 @@
-const { expressjwt: expressJwt } = require("express-jwt")
+// const { expressjwt: expressJwt } = require("express-jwt")
+const jwt = require("jsonwebtoken")
+const mongoose = require("mongoose")
+const Users = mongoose.model("Users")
 const getTokenFromHeaders = (req) => {
     const {
         headers: { authorization },
@@ -10,46 +13,57 @@ const getTokenFromHeaders = (req) => {
     return null
 }
 
-exports.required = () => {
+exports.required = (req) => {
     const secret = process.env.secret
     return console.log(
         expressJwt({
             secret,
             userProperty: "payload",
-            getToken: getTokenFromHeaders,
+            getToken: getTokenFromHeaders(req),
         })
     )
 }
 
-exports.optional = () => {
+exports.optional = (req) => {
     const secret = process.env.secret
     return console.log(
         expressJwt({
             secret,
             userProperty: "payload",
-            getToken: getTokenFromHeaders,
+            getToken: getTokenFromHeaders(req),
             credentialsRequired: false,
         })
     )
 }
 
-exports.adminAuth = (req, res, next) => {
-    const token = getTokenFromHeaders
-    if (token) {
-        expressJwt.verify(
+const adminAuth = (req, res, next) => {
+    const token = getTokenFromHeaders(req)
+
+    if (token != null) {
+        jwt.verify(
             token,
-            process.env.JWT_SECRET,
-            (err, decodedToken) => {
+            process.env.TOKEN_SECRET,
+            async (err, decodedToken) => {
                 if (err) {
+                    console.log(err)
                     return res.status(401).json({ message: "Not authorized" })
                 } else {
-                    if (decodedToken.role !== "admin") {
-                        return res
-                            .status(401)
-                            .json({ message: "Not authorized" })
-                    } else {
-                        next()
-                    }
+                    await Users.findById(decodedToken.id)
+                        .then((user) => {
+                            if (user.role !== "admin") {
+                                return res
+                                    .status(401)
+                                    .json({ message: "Not authorized" })
+                            } else {
+                                next()
+                            }
+                        })
+                        .catch((err) =>
+                            res.status(400).json({
+                                message: "User not found",
+                                error: err.message,
+                            })
+                        )
                 }
             }
         )
@@ -61,22 +75,31 @@ exports.adminAuth = (req, res, next) => {
 }
 
 exports.userAuth = (req, res, next) => {
-    const token = getTokenFromHeaders
+    const token = getTokenFromHeaders(req)
     if (token) {
         expressJwt.verify(
             token,
             process.env.JWT_SECRET,
-            (err, decodedToken) => {
+            async (err, decodedToken) => {
                 if (err) {
                     return res.status(401).json({ message: "Not authorized" })
                 } else {
-                    if (decodedToken.role !== "Basic") {
-                        return res
-                            .status(401)
-                            .json({ message: "Not authorized" })
-                    } else {
-                        next()
-                    }
+                    await Users.findById(decodedToken.id)
+                        .then((user) => {
+                            if (user.role !== "Customer-1") {
+                                return res
+                                    .status(401)
+                                    .json({ message: "Not authorized" })
+                            } else {
+                                next()
+                            }
+                        })
+                        .catch((err) =>
+                            res.status(400).json({
+                                message: "User not found",
+                                error: err.message,
+                            })
+                        )
                 }
             }
         )
@@ -86,3 +109,33 @@ exports.userAuth = (req, res, next) => {
             .json({ message: "Not authorized, token not available" })
     }
 }
+
+const userId = (req) => {
+    const token = getTokenFromHeaders(req)
+    if (token) {
+        jwt.verify(
+            token,
+            process.env.TOKEN_SECRET,
+            async (err, decodedToken) => {
+                if (err) return { message: "Not authorized", error: err }
+                await Users.findById(decodedToken.id)
+                    .then((user) => {
+                        if (user) {
+                            console.log(user)
+                            return { id: decodedToken.id }
+                        } else {
+                            console.log("user not found")
+                            return { message: "User not found" }
+                        }
+                    })
+                    .catch((err) => {
+                        return { message: err }
+                    })
+            }
+        )
+    } else {
+        return { message: "Not authorized, token not available" }
+    }
+}
+
+module.exports = { userId, adminAuth }

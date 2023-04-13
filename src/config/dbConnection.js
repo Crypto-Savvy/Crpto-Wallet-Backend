@@ -4,13 +4,10 @@ const mongoose = require("mongoose")
 mongoose.promise = global.Promise
 
 //Connect the using mongoose to the database
-mongoose.connect(
-    "mongodb+srv://etana:1234abcd@cluster0.mv9yu4y.mongodb.net/CryptoWalletBackend",
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    }
-)
+mongoose.connect(process.env.DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
 mongoose.set("strictQuery", true)
 mongoose.set("debug", true)
 

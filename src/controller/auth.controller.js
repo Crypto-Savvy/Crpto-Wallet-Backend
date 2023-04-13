@@ -85,7 +85,7 @@ exports.login = async (req, res, next) => {
                     const user = passportUser
                     user.token = passportUser.generateJWT()
 
-                    return res.json({ user: user.toAuthJSON() })
+                    return res.json(user.toAuthJSON())
                 }
 
                 return res.status(400).send(info)
